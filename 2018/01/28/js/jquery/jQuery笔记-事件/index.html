@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="这是木杉的个人博客"><title>jQuery笔记-事件 | 木杉的博客</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/6.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">jQuery笔记-事件</h1><a id="logo" href="/.">木杉的博客</a><p class="description">要么精通，要么死</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div id="layout" class="pure-g"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">jQuery笔记-事件</h1><div class="post-meta">Jan 28, 2018<span> | </span><span class="category"><a href="/categories/JavaScript/">JavaScript</a></span><script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> 阅读</span></span></div><a data-disqus-identifier="2018/01/28/js/jquery/jQuery笔记-事件/" href="/2018/01/28/js/jquery/jQuery笔记-事件/#disqus_thread" class="disqus-comment-count"></a><div class="post-content"><p>jquery事件绑定弄了好几次老是忘记。记录一下。</p>
+<a id="more"></a>
+<h2 id="历史"><a href="#历史" class="headerlink" title="历史"></a>历史</h2><p>从jQuery1.7开始，推荐使用<code>.on()</code>来绑定事件。之前的版本大家一般使用的<code>.bind()</code>,<code>.delegate()</code>,<code>.live()</code>来绑定事件，其中<code>.live()</code>在1.7版本中被标记为弃用，1.9版本中被移除。<code>.bind()</code>,<code>.delegate()</code>虽然一直保留到现在，但是也是不推荐使用的。</p>
+<p>对于jQuery3.x，绑定事件用<code>.on()</code>，取消绑定使用<code>.off()</code>，一次性绑定使用<code>.one()</code>。</p>
+<h2 id="on方法"><a href="#on方法" class="headerlink" title="on方法"></a>on方法</h2><p><code>.on()</code>有两种调用方式：</p>
+<p>调用方式一：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.on( events [, selector ] [, data ], handler )</span><br></pre></td></tr></table></figure>
+<p>参数：</p>
+<ul>
+<li><code>events</code>(String)<br>一个或者多个事件名，多个的话用空格隔开。</li>
+<li><code>selector</code>(String)<br>用来筛选当前元素子元素的选择器。如果为<code>null</code>或者是不填，则事件到达当前元素的时候就触发。</li>
+<li><code>data</code>(Anything)<br>传递给<code>event.data</code>的参数。</li>
+<li><code>handler</code>(Function( Event eventObject [, Anything extraParameter ] [, … ] ))<br>事件触发时执行的函数。如果把<code>handler</code>设置为<code>false</code>，则相当于是一个返回<code>false</code>的函数。</li>
+</ul>
+<p>调用方式二：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.on( events [, selector ] [, data ] )</span><br></pre></td></tr></table></figure>
+<p>这种调用方式与方式一的区别是<code>events</code>不是一个字符串而是一个对象。这个对象的key是事件字符串，value是对应的处理回调函数。所以这个方式也就不需要<code>handler</code>参数了。</p>
+<p>事件处理函数返回false，或者指定事件处理函数为false的效果是调用了<code>event.stopPropagation()</code>和<code>event.preventDefault()</code></p>
+<p>事件处理函数中的<code>this</code>变量，如果是直接绑定，则是<code>this</code>就是这个元素的引用。如果是事件委托，则是<code>selector</code>指定的元素。</p>
+<p>jQuery传递给事件处理函数的Event对象是对浏览器的event对象的规范化处理后的对象，如果想要拿到原始的event对象，可以从<code>event.originalEvent</code>属性获取。</p>
+<h2 id="直接事件和代理事件"><a href="#直接事件和代理事件" class="headerlink" title="直接事件和代理事件"></a>直接事件和代理事件</h2><p>指定<code>selector</code>参数时，是使用了<strong>事件委托</strong>模式。js事件处理中，事件委托是非常重要的一个模式。它有两个优点：</p>
+<ol>
+<li>提高性能。因为js中函数也是对象，所以如果为所有的元素都直接添加事件处理函数，会产生很多的对象，对内存消耗比较大，对象和页面见要建立联系，也会拖慢页面的速度。还有如果你修改/替换了页面的元素，而没有解绑事件处理函数，很可能会导致这些函数和页面元素都无法被垃圾回收。通过事件委托，减少事件处理函数，以及其和元素的连接，会提高性能。</li>
+<li>对于新添加的子元素，事件委托可以直接生效。如果不用事件委托，需要在新加子元素是都添加事件处理函数，麻烦且低性能。</li>
+</ol>
+<h2 id="事件命名空间"><a href="#事件命名空间" class="headerlink" title="事件命名空间"></a>事件命名空间</h2><p>jQuery在指定事件名称时，可以指定事件的命名空间，用于方便地触发或者删除事件。</p>
+<p>比如指定事件名称”click.myPlugin.simple”，那么可以使用<code>.off(&quot;click.myPlugin&quot;)</code>或者<code>.off(&quot;click.simple&quot;)</code>方法来删除这个事件处理函数，而不影响别的时间处理函数。</p>
+<h2 id="简便写法"><a href="#简便写法" class="headerlink" title="简便写法"></a>简便写法</h2><p>对于常用的事件，jQuery提供了特定的方法进行事件处理：</p>
+<ul>
+<li>click</li>
+<li>dbclick</li>
+<li>mousedown</li>
+<li>mouseup</li>
+<li>mousemove</li>
+<li>mouseenter</li>
+<li>mouseleave</li>
+<li>mouseover</li>
+<li>mouseout</li>
+<li><p>contextmenu</p>
+</li>
+<li><p>keydown</p>
+</li>
+<li>keypress</li>
+<li><p>keyup</p>
+</li>
+<li><p>blur</p>
+</li>
+<li>focus</li>
+<li>focusin</li>
+<li><p>focusout</p>
+</li>
+<li><p>ready</p>
+</li>
+<li>resize</li>
+<li>change</li>
+<li>scroll</li>
+<li>select</li>
+<li>submit</li>
+</ul>
+<p>简便写法无法指定selector参数。</p>
+<p>废弃的方法：</p>
+<ul>
+<li>load</li>
+<li>unload</li>
+<li>error</li>
+</ul>
+<h2 id="触发事件"><a href="#触发事件" class="headerlink" title="触发事件"></a>触发事件</h2><p>使用jQuery提供的trigger可以触发事件，事件是会冒泡的：</p>
+<ul>
+<li><code>trigger( eventType [, extraParameters ] )</code></li>
+<li><code>trigger( event [, extraParameters ] )</code> event是一个<code>jQuery.Event</code>对象</li>
+</ul>
+<p>还有一个triggerHandler方法：</p>
+<ul>
+<li><code>triggerHandler( eventType [, extraParameters ] )</code></li>
+<li><code>triggerHandler( event [, extraParameters ] )</code></li>
+</ul>
+<p>triggerHandler方法只会触发元素上绑定的所有事件处理函数，而不会让事件冒泡。</p>
+<p>注意：</p>
+<ol>
+<li>除了window对象，在其他的任何对象上调用trigger，如果没有调用<code>event.preventDefault()</code>，会调用这个对象上和方法同名的方法，比如<code>.triggerHandler( &quot;submit&quot; )</code>会尝试调用<code>submit</code>方法。而<code>triggerHandler</code>不会这么做</li>
+<li>trigger和triggerHandler，都会尝试调用对象上on前缀的和evnet同名的方法。 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2></li>
+</ol>
+<ul>
+<li><a href="https://api.jquery.com/on/" target="_blank" rel="noopener">.on() | jQuery API Documentation</a></li>
+<li><a href="https://api.jquery.com/trigger/" target="_blank" rel="noopener">.trigger() | jQuery API Documentation</a></li>
+<li><a href="http://www.cnblogs.com/oneword/archive/2010/11/22/1884413.html" target="_blank" rel="noopener">jQuery事件与事件对象 - Localhost - 博客园</a></li>
+<li><a href="http://www.cnblogs.com/aaronjs/p/3444874.html" target="_blank" rel="noopener">解密jQuery事件核心 - 绑定设计（一） - 【Aaron】 - 博客园</a></li>
+</ul>
+</div><div class="reward"><hr><div class="text">如果觉得文章对你有帮助，就打赏杯咖啡钱呗😊</div><img src="/img/reward/weixin.png"><img src="/img/reward/alipay.png"></div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="http://mushanshitiancai.github.io/2018/01/28/js/jquery/jQuery笔记-事件/" data-id="cjik48ts300jwn731z1tcj4tz" class="article-share-link">分享</a><div class="tags"><a href="/tags/js/">js</a><a href="/tags/javascript/">javascript</a><a href="/tags/jquery/">jquery</a></div><div class="post-nav"><a href="/2018/01/30/java/language/NullPointerException异常堆栈消失问题/" class="pre">NullPointerException异常堆栈消失问题</a><a href="/2018/01/25/tools/FFmpeg笔记-生成封面和内容拼图/" class="next">FFmpeg笔记-生成封面和内容拼图</a></div><div id="disqus_thread"><div class="btn_click_load"><button class="disqus_click_btn">阅读评论 「请确保 disqus.com 可以正常加载」</button></div><script>var disqus_shortname = 'mushan';
+var disqus_identifier = '2018/01/28/js/jquery/jQuery笔记-事件/';
+var disqus_title = 'jQuery笔记-事件';
+var disqus_url = 'http://mushanshitiancai.github.io/2018/01/28/js/jquery/jQuery笔记-事件/';
+$('.btn_click_load').click(function() {
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+  $('.btn_click_load').css('display','none');
+});
+$.ajax({
+  url: 'https://disqus.com/favicon.ico',
+  timeout: 3000,
+  type: 'GET',
+  success: (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    $('.btn_click_load').css('display','none');
+  })(),
+  error: function() {
+    $('.btn_click_load').css('display','block');
+  }
+});</script><script id="dsq-count-scr" src="//mushan.disqus.com/count.js" async></script></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" class="search-form"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="http://mushanshitiancai.github.io"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker/">Docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/Groovy/">Groovy</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/JDK源码阅读/">JDK源码阅读</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/掌握Java/">掌握Java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/调试/">调试</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaScript/">JavaScript</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/JavaScript/TypeScript/">TypeScript</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/MongoDB/">MongoDB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/RabbitMQ/">RabbitMQ</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tomcat/">Tomcat</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/electron/">electron</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/自动化/">自动化</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/nginx/" style="font-size: 15px;">nginx</a> <a href="/tags/work/" style="font-size: 15px;">work</a> <a href="/tags/log/" style="font-size: 15px;">log</a> <a href="/tags/db/" style="font-size: 15px;">db</a> <a href="/tags/mongodb/" style="font-size: 15px;">mongodb</a> <a href="/tags/js/" style="font-size: 15px;">js</a> <a href="/tags/angularjs/" style="font-size: 15px;">angularjs</a> <a href="/tags/react/" style="font-size: 15px;">react</a> <a href="/tags/mmnote/" style="font-size: 15px;">mmnote</a> <a href="/tags/architecture/" style="font-size: 15px;">architecture</a> <a href="/tags/protocol-buffers/" style="font-size: 15px;">protocol-buffers</a> <a href="/tags/blog/" style="font-size: 15px;">blog</a> <a href="/tags/mq/" style="font-size: 15px;">mq</a> <a href="/tags/redis/" style="font-size: 15px;">redis</a> <a href="/tags/tools/" style="font-size: 15px;">tools</a> <a href="/tags/emacs/" style="font-size: 15px;">emacs</a> <a href="/tags/管理后台/" style="font-size: 15px;">管理后台</a> <a href="/tags/linux/" style="font-size: 15px;">linux</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/docker/" style="font-size: 15px;">docker</a> <a href="/tags/shell/" style="font-size: 15px;">shell</a> <a href="/tags/os/" style="font-size: 15px;">os</a> <a href="/tags/vagrant/" style="font-size: 15px;">vagrant</a> <a href="/tags/tmux/" style="font-size: 15px;">tmux</a> <a href="/tags/mac/" style="font-size: 15px;">mac</a> <a href="/tags/automation/" style="font-size: 15px;">automation</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/http/" style="font-size: 15px;">http</a> <a href="/tags/python/" style="font-size: 15px;">python</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/php/" style="font-size: 15px;">php</a> <a href="/tags/project/" style="font-size: 15px;">project</a> <a href="/tags/software/" style="font-size: 15px;">software</a> <a href="/tags/test/" style="font-size: 15px;">test</a> <a href="/tags/ffmpeg/" style="font-size: 15px;">ffmpeg</a> <a href="/tags/gm/" style="font-size: 15px;">gm</a> <a href="/tags/graphicsmagick/" style="font-size: 15px;">graphicsmagick</a> <a href="/tags/wireshark/" style="font-size: 15px;">wireshark</a> <a href="/tags/vscode/" style="font-size: 15px;">vscode</a> <a href="/tags/web/" style="font-size: 15px;">web</a> <a href="/tags/curl/" style="font-size: 15px;">curl</a> <a href="/tags/jvm/" style="font-size: 15px;">jvm</a> <a href="/tags/javafx/" style="font-size: 15px;">javafx</a> <a href="/tags/guava/" style="font-size: 15px;">guava</a> <a href="/tags/junit/" style="font-size: 15px;">junit</a> <a href="/tags/idea/" style="font-size: 15px;">idea</a> <a href="/tags/groovy/" style="font-size: 15px;">groovy</a> <a href="/tags/tomcat/" style="font-size: 15px;">tomcat</a> <a href="/tags/maven/" style="font-size: 15px;">maven</a> <a href="/tags/doclet/" style="font-size: 15px;">doclet</a> <a href="/tags/servlet/" style="font-size: 15px;">servlet</a> <a href="/tags/dubbo/" style="font-size: 15px;">dubbo</a> <a href="/tags/electron/" style="font-size: 15px;">electron</a> <a href="/tags/spring/" style="font-size: 15px;">spring</a> <a href="/tags/css/" style="font-size: 15px;">css</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/jquery/" style="font-size: 15px;">jquery</a> <a href="/tags/nodejs/" style="font-size: 15px;">nodejs</a> <a href="/tags/typescript/" style="font-size: 15px;">typescript</a> <a href="/tags/ts/" style="font-size: 15px;">ts</a> <a href="/tags/gulp/" style="font-size: 15px;">gulp</a> <a href="/tags/webpack/" style="font-size: 15px;">webpack</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/06/17/linux/Linux-UNIX编程如何保证文件落盘/">Linux/UNIX编程如何保证文件落盘</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/db/MongoDB遍历方式对比/">MongoDB遍历方式对比</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/04/java/language/JDK源码阅读-RandomAccessFile/">JDK源码阅读-RandomAccessFile</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/04/java/language/JDK源码阅读-FileOutputStream/">JDK源码阅读-FileOutputStream</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/03/java/language/JDK源码阅读-FileInputStream/">JDK源码阅读-FileInputStream</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/29/java/language/JDK源码阅读-FileDescriptor/">JDK源码阅读-FileDescriptor</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/28/java/debug/JVM堆内存使用率持续上升的一种排查思路/">JVM堆内存使用率持续上升的一种排查思路</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/09/network/AWS-S3-Range下载响应测试/">AWS S3 Range下载响应测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/15/db/MongoDB笔记-查询计划/">MongoDB笔记-查询计划</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/23/network/URI-URL与URN的区别/">URI,URL与URN的区别</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-comment-o"> 最近评论</i></div><script type="text/javascript" src="//mushan.disqus.com/recent_comments_widget.js?num_items=5&amp;hide_avatars=1&amp;avatar_size=32&amp;excerpt_length=20&amp;hide_mods=1"></script></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://anotom.com/" title="鑫哥的博客" target="_blank">鑫哥的博客</a><ul></ul><a href="https://www.caylor.cc/" title="乐哥的博客" target="_blank">乐哥的博客</a><ul></ul><a href="http://zach41.github.io/" title="小美的博客" target="_blank">小美的博客</a><ul></ul><a href="http://blog.csdn.net/sinat_25127047" title="瀚文的博客" target="_blank">瀚文的博客</a><ul></ul><a href="http://blog.csdn.net/xiaohangblog?viewmode=contents)" title="小杭的博客" target="_blank">小杭的博客</a><ul></ul><a href="http://bettercuicui.github.io/" title="夏侯的博客" target="_blank">夏侯的博客</a><ul></ul><a href="http://damye.github.io/" title="符尧的博客" target="_blank">符尧的博客</a><ul></ul><a href="http://blog.shrp.me/" title="尚弟的博客" target="_blank">尚弟的博客</a><ul></ul><a href="http://imethan.cn" title="应锋的博客" target="_blank">应锋的博客</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2018 <a href="/." rel="nofollow">木杉的博客.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>

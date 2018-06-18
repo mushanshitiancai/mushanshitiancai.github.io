@@ -1,0 +1,118 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="这是木杉的个人博客"><title>使用NFS共享目录 | 木杉的博客</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/6.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">使用NFS共享目录</h1><a id="logo" href="/.">木杉的博客</a><p class="description">要么精通，要么死</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div id="layout" class="pure-g"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">使用NFS共享目录</h1><div class="post-meta">May 21, 2016<script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> 阅读</span></span></div><a data-disqus-identifier="2016/05/21/linux/使用nfs共享目录/" href="/2016/05/21/linux/使用nfs共享目录/#disqus_thread" class="disqus-comment-count"></a><div class="post-content"><p>公司的开发机上使用samba服务让使用windows的电脑可以像操作本地文件一样操作开发机上的文件，这给开发带来许多遍历，比如开发人员可以使用自己喜爱的IDE来打开开发机上的文件。</p>
+<p>在捣腾虚拟机的过程中，我也希望可以在宿主机上方便的操作虚拟机的文件。这里我不打算使用samba，因为samba是linux模拟windows的远程磁盘协议的一个开源软件。这是因为公司的开发人员使用的是windows。而我的机器是mac，UNIX系的，所以直接使用linux世界的远程文件系数nfs就可以了。nfs有一个好处就是现在的linux基本都默认安装了的，是一个linux世界广受支持的协议。</p>
+<p>我现在的场景是在mac上有两个虚拟机，一个是centos，一个是Ubuntu。打算在centos上开启nfs服务，让后让mac和Ubuntu来访问centos上的文件。</p>
+<a id="more"></a>
+<h2 id="检测是否安装了nfs"><a href="#检测是否安装了nfs" class="headerlink" title="检测是否安装了nfs"></a>检测是否安装了nfs</h2><p>虽然centos和Ubuntu都默认安装了，我们还是检测一下为好：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ rpm -qa | grep nfs</span><br><span class="line">nfs-utils-1.2.3-54.el6.x86_64</span><br><span class="line">nfs-utils-lib-1.1.5-9.el6.x86_64</span><br><span class="line"></span><br><span class="line">$ rpm -qa | grep rpcbind</span><br><span class="line">rpcbind-0.2.0-11.el6.x86_64</span><br></pre></td></tr></table></figure>
+<h2 id="设置需要共享的目录"><a href="#设置需要共享的目录" class="headerlink" title="设置需要共享的目录"></a>设置需要共享的目录</h2><p>默认nfs不会去共享任何目录，我们可以在<code>/etc/exports</code>中指定需要共享的目录。</p>
+<p>这里我打算共享<code>/home</code>这个目录，可以在<code>/etc/exports</code>文件中写入：</p>
+<pre><code>/home *(rw)
+</code></pre><p><code>*(rw)</code>指的是可以让任何IP的人访问，访问权限是可读可写。exports文件的配置我们后面细讲，现在主要任务是尽快的走一遍共享的流程。</p>
+<h2 id="启动nfs服务"><a href="#启动nfs服务" class="headerlink" title="启动nfs服务"></a>启动nfs服务</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo service rpcbind start</span><br><span class="line">$ sudo service nfs start</span><br></pre></td></tr></table></figure>
+<p>这样服务器上的设置就搞定了！</p>
+<h2 id="客户端连接nfs"><a href="#客户端连接nfs" class="headerlink" title="客户端连接nfs"></a>客户端连接nfs</h2><p>先说说linux(Ubuntu)下怎么连接：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir mount_dir</span><br><span class="line">$ sudo mount -t nfs server_ip:/home ./mount_dir</span><br></pre></td></tr></table></figure>
+<p>如果你是按照我的步骤来的话，这会儿你应该会遇到一个错误提示：</p>
+<pre><code>mount.nfs: access denied by server while mounting 192.168.33.10:/home
+</code></pre><p>错误提示我们没有权限挂载远程目录。这是为啥？一番捣腾，发现可以在日志中找到答案，查看服务端的<code>/var/log/messages</code>，可以看到这么一句：</p>
+<pre><code>May 22 04:17:17 localhost rpc.mountd[6463]: refused mount request from 192.168.33.1 for /home (/home): illegal port 62807
+</code></pre><p>从参考资料3中得知，nfs的exports配置，默认值允许1024以下的端口接入，所以我们要放开这个限制，修改服务端的<code>/etc/exports</code>文件：</p>
+<pre><code>/home *(rw,insecure)
+</code></pre><p>然后重启nfs服务：</p>
+<pre><code>$ service nfs restart
+</code></pre><p>这样客户端就挂载成功了。</p>
+<p>Mac上的挂载可以在finder中操作。打开finder，按下Command+K，就会打开一个链接到服务器的对话框，输入<code>nfs://192.168.33.10/home</code>，回车，就OK了。</p>
+<p>Finder默认会把远程目录挂载到<code>/Volumes</code>目录下。</p>
+<h2 id="NFS的配置文件"><a href="#NFS的配置文件" class="headerlink" title="NFS的配置文件"></a>NFS的配置文件</h2><p>经过上面的步骤，我们已经成功的挂载远程目录到客户端上了，但是客户端在修改文件的时候只能享受到其他组用户的权限，很不方便，而且新建目录的话，在服务端上没有对应的用户，导致<code>ll</code>的时候，uid直接显示数字。</p>
+<p>想要让客户端映射为服务端上具体的一个用户，这就涉及到NFS对于输出目录的权限设置了，也就需要了解exports的具体配置，我们来了解一下。</p>
+<p>NFS的配置文件是<code>/etc/exports</code>，可以在其中指定想要共享那些目录，共享的权限设置等。默认是空的。</p>
+<p>其配置的格式以行为单位，每行的格式是：</p>
+<pre><code>&lt;输出目录&gt; [客户端1 选项（访问权限,用户映射,其他）] [客户端2 选项（访问权限,用户映射,其他）]
+</code></pre><p>例子：</p>
+<pre><code>/tmp  192.168.1.0/24(ro)   localhost(rw)   *.ev.ncku.edu.tw(ro,sync)
+</code></pre><p>解释一下配置：</p>
+<p><strong>输出目录：</strong>指定打算共享的目录</p>
+<p><strong>客户端：</strong>指你打算什么IP来的用户可以访问这个目录，可以使用<code>*</code>通配符</p>
+<p><strong>选项：</strong>有多种类型的选项：</p>
+<p><em>访问权限：</em>指目标用户对输出目录拥有什么读写权限，有两个选择：</p>
+<ul>
+<li>ro 只读</li>
+<li>rw 读写</li>
+</ul>
+<p><em>用户映射：</em>这是很重要的一个选项，指定客户端在操作目录时，映射为本地的什么用户</p>
+<ul>
+<li>all_squash        :将远程范围的<strong>所有用户</strong>映射为匿名用户(由anonuid/anongid指定)</li>
+<li>no_all_squash(默认):对远程<strong>所有用户</strong>不做映射</li>
+<li>root_squash(默认)  :将客户端的<strong>root用户</strong>映射为匿名用户(由anonuid/anongid指定)</li>
+<li>no_root_squash    :对客户端的<strong>root用户</strong>不错映射</li>
+<li>anonuid=xxx       :指定匿名用户的UID，如果不做指定，则使用默认的65534，在centos上是nfsnobody，在Ubuntu上是nobody</li>
+<li>anongid=xxx       :指定匿名用户的GID，如果不做指定，则使用默认的65534，在centos上是nfsnobody，在Ubuntu上是nogroup</li>
+</ul>
+<p>可以看到，对于客户端的普通用户和root用户，在用户映射上是独立的配置。默认的配置是：no_all_squash,root_squash，也就是普通用户不会进行映射，而root用户会映射为匿名用户。</p>
+<p><em>其他选项：</em></p>
+<ul>
+<li>secure(默认): 限制客户端只能从小于1024的TCP/IP端口连接nfs服务器</li>
+<li>insecure    : 允许客户端使用大于1024的TCP/IP端口连接nfs服务器</li>
+<li>sync(默认)  : 将数据同步写入内存缓冲和磁盘，效率低但可保持数据一致</li>
+<li>async       : 将数据写入内存缓冲，必要时才写入硬盘</li>
+<li>wdelay(默认): 将写操作收集起来统一执行，提高效率但有延迟</li>
+<li>no_wdelay  : 有写操作就立即执行</li>
+<li>subtree_check         : 如果输出目录是一个子目录，则nfs检测其父目录的权限</li>
+<li>no_subtree_check(默认): 如果输出目录是一个子目录，则nfs不检测其父目录的权限</li>
+</ul>
+<p>这里我们注意一下<code>secure/insecure</code>选项，因为默认是secure，所以大于1024的客户端端口都是不允许的，这个我们上面提到了。</p>
+<p>现在我们可以看懂上面的例子了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/tmp  192.168.1.0/24(ro)   localhost(rw)   *.ev.ncku.edu.tw(ro,sync)</span><br><span class="line"># 共享/tmp目录，192.168.1.0/24的用户端拥有自读权限，本机的用户端拥有读写权限，来自*.ev.ncku.edu.tw的用户端拥有自读权限，并且是同步的（其实默认就是同步的）</span><br></pre></td></tr></table></figure>
+<p>我现在是为了方便操作虚拟机内的文件，所以我希望来自任何IP的普通用户，都映射为本机的一个特定普通用户，这样远程操作服务端的文件就和在服务端上操作一样的，可以这样配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 500是我想要映射的服务端上的一个用户</span><br><span class="line">/home *(rw,insecure,all_squash,anonuid=500,anongid=500)</span><br></pre></td></tr></table></figure>
+<p>注意：如果使用了all_squash，那么no_root_squash就无效了。</p>
+<p>如果你想查看附加了默认配置的最终配置，可以查看文件：<code>/var/lib/nfs/etab</code></p>
+<p>修改了配置后并不需要重启nfs服务，运行</p>
+<pre><code>$ exportfs -av
+</code></pre><p>即可。</p>
+<h2 id="客户端取消挂载"><a href="#客户端取消挂载" class="headerlink" title="客户端取消挂载"></a>客户端取消挂载</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo umount mountdir</span><br></pre></td></tr></table></figure>
+<p>如果遇到了错误：<code>device is busy</code>，是因为还有进程占用了当前目录，需要找出并关闭才能umount。具体参考资料4，5。</p>
+<h2 id="小知识"><a href="#小知识" class="headerlink" title="小知识"></a>小知识</h2><h3 id="用户和用户组的定义文件"><a href="#用户和用户组的定义文件" class="headerlink" title="用户和用户组的定义文件"></a>用户和用户组的定义文件</h3><ul>
+<li>/etc/passwd</li>
+<li>/etc/group</li>
+</ul>
+<h3 id="如何查看某个用户的UID，GID？"><a href="#如何查看某个用户的UID，GID？" class="headerlink" title="如何查看某个用户的UID，GID？"></a>如何查看某个用户的UID，GID？</h3><ul>
+<li>id 查看当前用户</li>
+<li>id user 查看具体用户</li>
+</ul>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ol>
+<li><a href="http://blog.chinaunix.net/uid-26284318-id-3111651.html" target="_blank" rel="noopener">CentOS 6 NFS的安装配置-roothomes-ChinaUnix博客</a></li>
+<li><a href="http://blog.chinaunix.net/uid-8038341-id-179288.html" target="_blank" rel="noopener">NFS配置文件/etc/exports-cr858923-ChinaUnix博客</a></li>
+<li><a href="http://blog.chinaunix.net/uid-20554957-id-3444786.html" target="_blank" rel="noopener">mount.nfs: access denied by server while mounting 一个解决办法-pppStar-ChinaUnix博客</a></li>
+<li><a href="http://dikar.iteye.com/blog/634862" target="_blank" rel="noopener">Stale NFS file handle的解决方法 - dikar云墨竹 - ITeye技术网站</a></li>
+<li><a href="http://blog.sina.com.cn/s/blog_6c9eaa15010185bt.html" target="_blank" rel="noopener">(1)Stale NFS file handle 的解决方法<em>whfwind</em>新浪博客</a></li>
+<li>✨<a href="http://www.cnblogs.com/mchina/archive/2013/01/03/2840040.html" target="_blank" rel="noopener">Linux NFS服务器的安装与配置 - David_Tang - 博客园</a></li>
+<li><a href="http://www.360doc.com/content/14/0527/00/17617523_381280598.shtml" target="_blank" rel="noopener">root_squash关于NFS参数说明</a></li>
+<li><a href="http://linux.die.net/man/5/exports" target="_blank" rel="noopener">exports(5): NFS server export table - Linux man page</a></li>
+</ol>
+</div><div class="reward"><hr><div class="text">如果觉得文章对你有帮助，就打赏杯咖啡钱呗😊</div><img src="/img/reward/weixin.png"><img src="/img/reward/alipay.png"></div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="http://mushanshitiancai.github.io/2016/05/21/linux/使用nfs共享目录/" data-id="cjik48th8004yn731bjrzuzap" class="article-share-link">分享</a><div class="tags"><a href="/tags/linux/">linux</a></div><div class="post-nav"><a href="/2016/05/23/java/language/掌握Java-并发/" class="pre">掌握Java-并发</a><a href="/2016/05/21/db/学习Redis-类型与基本命令/" class="next">学习Redis-类型与基本命令</a></div><div id="disqus_thread"><div class="btn_click_load"><button class="disqus_click_btn">阅读评论 「请确保 disqus.com 可以正常加载」</button></div><script>var disqus_shortname = 'mushan';
+var disqus_identifier = '2016/05/21/linux/使用nfs共享目录/';
+var disqus_title = '使用NFS共享目录';
+var disqus_url = 'http://mushanshitiancai.github.io/2016/05/21/linux/使用nfs共享目录/';
+$('.btn_click_load').click(function() {
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+  $('.btn_click_load').css('display','none');
+});
+$.ajax({
+  url: 'https://disqus.com/favicon.ico',
+  timeout: 3000,
+  type: 'GET',
+  success: (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    $('.btn_click_load').css('display','none');
+  })(),
+  error: function() {
+    $('.btn_click_load').css('display','block');
+  }
+});</script><script id="dsq-count-scr" src="//mushan.disqus.com/count.js" async></script></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" class="search-form"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="http://mushanshitiancai.github.io"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker/">Docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/Groovy/">Groovy</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/JDK源码阅读/">JDK源码阅读</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/掌握Java/">掌握Java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/调试/">调试</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaScript/">JavaScript</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/JavaScript/TypeScript/">TypeScript</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/MongoDB/">MongoDB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/RabbitMQ/">RabbitMQ</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tomcat/">Tomcat</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/electron/">electron</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/自动化/">自动化</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/nginx/" style="font-size: 15px;">nginx</a> <a href="/tags/work/" style="font-size: 15px;">work</a> <a href="/tags/log/" style="font-size: 15px;">log</a> <a href="/tags/db/" style="font-size: 15px;">db</a> <a href="/tags/mongodb/" style="font-size: 15px;">mongodb</a> <a href="/tags/js/" style="font-size: 15px;">js</a> <a href="/tags/angularjs/" style="font-size: 15px;">angularjs</a> <a href="/tags/react/" style="font-size: 15px;">react</a> <a href="/tags/mmnote/" style="font-size: 15px;">mmnote</a> <a href="/tags/architecture/" style="font-size: 15px;">architecture</a> <a href="/tags/protocol-buffers/" style="font-size: 15px;">protocol-buffers</a> <a href="/tags/blog/" style="font-size: 15px;">blog</a> <a href="/tags/mq/" style="font-size: 15px;">mq</a> <a href="/tags/redis/" style="font-size: 15px;">redis</a> <a href="/tags/tools/" style="font-size: 15px;">tools</a> <a href="/tags/emacs/" style="font-size: 15px;">emacs</a> <a href="/tags/管理后台/" style="font-size: 15px;">管理后台</a> <a href="/tags/linux/" style="font-size: 15px;">linux</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/docker/" style="font-size: 15px;">docker</a> <a href="/tags/shell/" style="font-size: 15px;">shell</a> <a href="/tags/os/" style="font-size: 15px;">os</a> <a href="/tags/vagrant/" style="font-size: 15px;">vagrant</a> <a href="/tags/tmux/" style="font-size: 15px;">tmux</a> <a href="/tags/mac/" style="font-size: 15px;">mac</a> <a href="/tags/automation/" style="font-size: 15px;">automation</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/http/" style="font-size: 15px;">http</a> <a href="/tags/python/" style="font-size: 15px;">python</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/php/" style="font-size: 15px;">php</a> <a href="/tags/project/" style="font-size: 15px;">project</a> <a href="/tags/software/" style="font-size: 15px;">software</a> <a href="/tags/test/" style="font-size: 15px;">test</a> <a href="/tags/ffmpeg/" style="font-size: 15px;">ffmpeg</a> <a href="/tags/gm/" style="font-size: 15px;">gm</a> <a href="/tags/graphicsmagick/" style="font-size: 15px;">graphicsmagick</a> <a href="/tags/wireshark/" style="font-size: 15px;">wireshark</a> <a href="/tags/vscode/" style="font-size: 15px;">vscode</a> <a href="/tags/web/" style="font-size: 15px;">web</a> <a href="/tags/curl/" style="font-size: 15px;">curl</a> <a href="/tags/jvm/" style="font-size: 15px;">jvm</a> <a href="/tags/javafx/" style="font-size: 15px;">javafx</a> <a href="/tags/guava/" style="font-size: 15px;">guava</a> <a href="/tags/junit/" style="font-size: 15px;">junit</a> <a href="/tags/idea/" style="font-size: 15px;">idea</a> <a href="/tags/groovy/" style="font-size: 15px;">groovy</a> <a href="/tags/tomcat/" style="font-size: 15px;">tomcat</a> <a href="/tags/maven/" style="font-size: 15px;">maven</a> <a href="/tags/doclet/" style="font-size: 15px;">doclet</a> <a href="/tags/servlet/" style="font-size: 15px;">servlet</a> <a href="/tags/dubbo/" style="font-size: 15px;">dubbo</a> <a href="/tags/electron/" style="font-size: 15px;">electron</a> <a href="/tags/spring/" style="font-size: 15px;">spring</a> <a href="/tags/css/" style="font-size: 15px;">css</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/jquery/" style="font-size: 15px;">jquery</a> <a href="/tags/nodejs/" style="font-size: 15px;">nodejs</a> <a href="/tags/typescript/" style="font-size: 15px;">typescript</a> <a href="/tags/ts/" style="font-size: 15px;">ts</a> <a href="/tags/gulp/" style="font-size: 15px;">gulp</a> <a href="/tags/webpack/" style="font-size: 15px;">webpack</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/06/17/linux/Linux-UNIX编程如何保证文件落盘/">Linux/UNIX编程如何保证文件落盘</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/db/MongoDB遍历方式对比/">MongoDB遍历方式对比</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/04/java/language/JDK源码阅读-RandomAccessFile/">JDK源码阅读-RandomAccessFile</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/04/java/language/JDK源码阅读-FileOutputStream/">JDK源码阅读-FileOutputStream</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/03/java/language/JDK源码阅读-FileInputStream/">JDK源码阅读-FileInputStream</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/29/java/language/JDK源码阅读-FileDescriptor/">JDK源码阅读-FileDescriptor</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/28/java/debug/JVM堆内存使用率持续上升的一种排查思路/">JVM堆内存使用率持续上升的一种排查思路</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/09/network/AWS-S3-Range下载响应测试/">AWS S3 Range下载响应测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/15/db/MongoDB笔记-查询计划/">MongoDB笔记-查询计划</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/23/network/URI-URL与URN的区别/">URI,URL与URN的区别</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-comment-o"> 最近评论</i></div><script type="text/javascript" src="//mushan.disqus.com/recent_comments_widget.js?num_items=5&amp;hide_avatars=1&amp;avatar_size=32&amp;excerpt_length=20&amp;hide_mods=1"></script></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://anotom.com/" title="鑫哥的博客" target="_blank">鑫哥的博客</a><ul></ul><a href="https://www.caylor.cc/" title="乐哥的博客" target="_blank">乐哥的博客</a><ul></ul><a href="http://zach41.github.io/" title="小美的博客" target="_blank">小美的博客</a><ul></ul><a href="http://blog.csdn.net/sinat_25127047" title="瀚文的博客" target="_blank">瀚文的博客</a><ul></ul><a href="http://blog.csdn.net/xiaohangblog?viewmode=contents)" title="小杭的博客" target="_blank">小杭的博客</a><ul></ul><a href="http://bettercuicui.github.io/" title="夏侯的博客" target="_blank">夏侯的博客</a><ul></ul><a href="http://damye.github.io/" title="符尧的博客" target="_blank">符尧的博客</a><ul></ul><a href="http://blog.shrp.me/" title="尚弟的博客" target="_blank">尚弟的博客</a><ul></ul><a href="http://imethan.cn" title="应锋的博客" target="_blank">应锋的博客</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2018 <a href="/." rel="nofollow">木杉的博客.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>

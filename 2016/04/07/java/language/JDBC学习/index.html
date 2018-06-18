@@ -1,0 +1,167 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="这是木杉的个人博客"><title>JDBC学习 | 木杉的博客</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/6.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">JDBC学习</h1><a id="logo" href="/.">木杉的博客</a><p class="description">要么精通，要么死</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div id="layout" class="pure-g"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">JDBC学习</h1><div class="post-meta">Apr 7, 2016<span> | </span><span class="category"><a href="/categories/Java/">Java</a></span><script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> 阅读</span></span></div><a data-disqus-identifier="2016/04/07/java/language/JDBC学习/" href="/2016/04/07/java/language/JDBC学习/#disqus_thread" class="disqus-comment-count"></a><div class="post-content"><h2 id="新建一个jdbc工程"><a href="#新建一个jdbc工程" class="headerlink" title="新建一个jdbc工程"></a>新建一个jdbc工程</h2><p>新建一个jdbc demo来体验一下流程。</p>
+<p>前提准备：</p>
+<ul>
+<li>虚拟机中安装mysql，虚拟机IP：192.168.33.10</li>
+<li>建立可以远程访问的用户mushan，密码111(演示用)</li>
+</ul>
+<p>上面的操作可以参考：<a href="http://mushanshitiancai.github.io/2016/04/10/mysql/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AEmysql/">安装配置mysql | 木杉的博客</a></p>
+<p>用maven建立一个jdbc工程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mvn archetype:generate -B -DarchetypeGroupId=org.apache.maven.archetypes -DarchetypeArtifactId=maven-archetype-quickstart -DgroupId=com.mushan -DartifactId=mvn-jdbc-test -Dversion=0.0.1SHNAPSHOT -Dpackage=com.mushan</span><br></pre></td></tr></table></figure>
+<p>也可以在eclispe中创建maven工程，更方便。</p>
+<p>添加mysql驱动程序依赖：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.38<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>运行<code>mvn package</code>安装依赖。</p>
+<p>一次完整的数据库操作流程：</p>
+<ul>
+<li>初始化数据库驱动</li>
+<li>使用<code>DriverManager.getConnection()</code>建立到数据库的连接</li>
+<li>使用<code>connection.createStatement()</code>建立语句类实例(Statement)</li>
+<li>使用<code>statement.executeQuery()</code>执行SQL语句获取ResultSet对象实例</li>
+<li>从ResultSet对象实例中获取结果</li>
+</ul>
+<p>简化版：获取连接→创建Statement→执行数据库操作→获取结果→关闭Statement→关闭结果集→关闭连接。</p>
+<p><strong>问题：</strong> 【TODO】 <code>关闭Statement→关闭结果集→关闭连接</code>，这个顺序是固定的么？我在别的地方看到了<code>关闭结果集→关闭Statement→关闭连接</code>，哪个是对的？</p>
+<p>对应的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.mushan;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.sql.Connection;</span><br><span class="line"><span class="keyword">import</span> java.sql.DriverManager;</span><br><span class="line"><span class="keyword">import</span> java.sql.ResultSet;</span><br><span class="line"><span class="keyword">import</span> java.sql.SQLException;</span><br><span class="line"><span class="keyword">import</span> java.sql.Statement;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">App</span> </span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">( String[] args )</span> <span class="keyword">throws</span> ClassNotFoundException, SQLException</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">    Class.forName(<span class="string">"com.mysql.jdbc.Driver"</span>);</span><br><span class="line">    String url=<span class="string">"jdbc:mysql://192.168.33.10:3306/jdbc_test"</span>;</span><br><span class="line">    String user=<span class="string">"mushan"</span>;<span class="comment">//用户名</span></span><br><span class="line">    String pwd=<span class="string">"111"</span>;<span class="comment">//密码</span></span><br><span class="line">    Connection con=DriverManager.getConnection(url,user,pwd);</span><br><span class="line">    Statement stmt = con.createStatement();</span><br><span class="line">    ResultSet rs = stmt.executeQuery(<span class="string">"show tables;"</span>);<span class="comment">//查询,返回结果集</span></span><br><span class="line">    <span class="keyword">while</span>(rs.next())&#123;</span><br><span class="line">        System.out.println(rs.getString(<span class="number">1</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    rs.close();</span><br><span class="line">    stmt.close();</span><br><span class="line">    con.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行代码：</p>
+<pre><code>$ mvn compile
+$ mvn exec:java -Dexec.mainClass=&quot;com.mushan.App&quot;  -Dexec.cleanupDaemonThreads=false
+</code></pre><p>输出<code>jdbc_test</code>中的表。成功！</p>
+<p>之后改用IDE了，直接命令行写Java太麻烦了。</p>
+<p><strong>问题：</strong></p>
+<ul>
+<li><p>executeQuery()中的SQL语句可以不加分号么?</p>
+<p>可以</p>
+</li>
+<li><p>statement对象可以复用么（进行多次查询）？</p>
+<p>可以</p>
+</li>
+</ul>
+<h2 id="jdbc-api"><a href="#jdbc-api" class="headerlink" title="jdbc api"></a>jdbc api</h2><p>jdbc主要的接口有：</p>
+<ul>
+<li>java.sql.DriverManager</li>
+<li>java.sql.Connection</li>
+<li>java.sql.Statement</li>
+<li>java.sql.ResultSet</li>
+<li>java.sql.PreparedStatement</li>
+<li>java.sql.CallableStatement</li>
+<li>java.sql.SQLException</li>
+<li>java.sql.SQLWarning</li>
+<li>java.sql.Time</li>
+<li>java.sql.Timestamp</li>
+<li>java.sql.Types</li>
+<li>java.sql.DatabaseMetaData</li>
+</ul>
+<h3 id="java-sql-DriverManager"><a href="#java-sql-DriverManager" class="headerlink" title="java.sql.DriverManager"></a>java.sql.DriverManager</h3><p>驱动管理。可以用DriverManager来获取具体的数据库驱动。</p>
+<h3 id="java-sql-Connection"><a href="#java-sql-Connection" class="headerlink" title="java.sql.Connection"></a>java.sql.Connection</h3><p>数据库驱动建立连接后获取的连接对象，可以用连接对象获取Statement对象，进行进行数据库操作。</p>
+<p>常用方法：</p>
+<ul>
+<li>close()                      关闭连接</li>
+<li>commit()                     提交（事务？）</li>
+<li>rollback()                   回滚（事务？）</li>
+<li>createStatement()            创建Statement对象</li>
+<li>prepareStatement(String sql) 返回PrepareStatement对象</li>
+<li>setAutoCommit(Boolean autoCommit) 设置是否自动提交</li>
+</ul>
+<h3 id="java-sql-Statement"><a href="#java-sql-Statement" class="headerlink" title="java.sql.Statement"></a>java.sql.Statement</h3><p>常用方法：</p>
+<ul>
+<li>close()                     关闭Statement对象</li>
+<li>executeQuery(String sql)    执行查询sql，返回ResultSet对象</li>
+<li>executeUpdate(String sql)   执行更新sql，返回更新的行数</li>
+<li>execute(String sql)         执行任意sql，返回bool值，表示是否返回了ResultSet对象</li>
+<li>getResultSet()              获取ResultSet对象</li>
+</ul>
+<p><strong>问题：</strong></p>
+<ul>
+<li><p>executeQuery()执行更新操作是什么下场？</p>
+<pre><code>Exception in thread &quot;main&quot; java.sql.SQLException: Can not issue data manipulation statements with executeQuery().
+</code></pre><p>  也就是说，不行。</p>
+</li>
+<li><p>executeUpdate()执行查询操作是什么下场？</p>
+<pre><code>Exception in thread &quot;main&quot; java.sql.SQLException: Can not issue SELECT via executeUpdate() or executeLargeUpdate().
+</code></pre><p>  也就是说，不行。</p>
+</li>
+<li><p>getResultSet()只会返回execute()的结果么？</p>
+<p>  四种情况：</p>
+<ul>
+<li>获得Statement后直接getResultSet  - null</li>
+<li>执行executeQuery后getResultSet  - 无论executeQuery结果如何，都是空结果集</li>
+<li>执行executeUpdate后getResultSet - null</li>
+<li>执行execute后getResultSet       - 如果是查询语句，null，如果是更新语句，则是返回的结果集</li>
+</ul>
+</li>
+</ul>
+<h3 id="java-sql-PreparedStatement"><a href="#java-sql-PreparedStatement" class="headerlink" title="java.sql.PreparedStatement"></a>java.sql.PreparedStatement</h3><p>PreparedStatement是预编译的Statement对象。因为是预编译，所以效率高一点。也是因为这个，所以在获取语句对象的时候就要指定sql语句。对于语句中的变量，可以使用<code>?</code>来占位，之后再设置为具体的值。</p>
+<p>常用方法：</p>
+<ul>
+<li>close()            关闭连接</li>
+<li>executeQuery()     执行查询sql，返回ResultSet对象</li>
+<li>executeUpdate()    执行更新sql，返回更新的行数</li>
+<li>execute()          执行任意sql，返回bool值，表示是否返回了ResultSet对象</li>
+<li>setBoolean(int paramIndex, boolean x)    替换?指定的参数，paramIndex指定是第几个?</li>
+<li>set…                                   不同类型有不同的set函数</li>
+<li>setDate(int paramIndex, java.sql.Date x) </li>
+<li>setTime(int paramIndex, java.sql.Time x)</li>
+<li>setObject(int paramIndex, Object x)</li>
+</ul>
+<p><strong>问题：</strong></p>
+<ul>
+<li><p>不设置参数执行会遇到什么问题？</p>
+<pre><code>Exception in thread &quot;main&quot; java.sql.SQLException: No value specified for parameter 1
+</code></pre></li>
+</ul>
+<h3 id="java-sql-CallableStatement"><a href="#java-sql-CallableStatement" class="headerlink" title="java.sql.CallableStatement"></a>java.sql.CallableStatement</h3><p>CallableStatement是用来调用存储过程的。</p>
+<h3 id="java-sql-ResultSet"><a href="#java-sql-ResultSet" class="headerlink" title="java.sql.ResultSet"></a>java.sql.ResultSet</h3><p>常用方法：</p>
+<ul>
+<li>next()</li>
+<li>getInt()</li>
+</ul>
+<h2 id="关闭连接"><a href="#关闭连接" class="headerlink" title="关闭连接"></a>关闭连接</h2><p>参考：<a href="http://k1121.iteye.com/blog/1279063" target="_blank" rel="noopener">JDBC数据库连接池connection关闭后Statement和ResultSet未关闭的问题 - k1121 - ITeye技术网站</a></p>
+<p>根据JDBC规范：</p>
+<blockquote>
+<p>JDBC. 4.0 Specification——13.1.4 Closing Statement Objects </p>
+<p>An application calls the method Statement.close to indicate that it has finished processing a statement. All Statement objects will be closed when the connection that created them is closed. However, it is good coding practice for applications to close statements as soon as they have finished processing them. This allows any external resources that the statement is using to be released immediately.<br>可以通过Statement.close来显式关闭statement。让创建statement的连接关闭后，所有对应的statement都会被关闭。但是在使用完statement后就关闭他们是最佳实践，因为这样可以释放statement占用的外部资源。</p>
+<p>Closing a Statement object will close and invalidate any instances of ResultSet produced by that Statement object. The resources held by the ResultSet object may not be released until garbage collection runs again, so it is a good practice to explicitly close ResultSet objects when they are no longer needed.<br>关闭Statement对象会关闭这个statement对象创建的所有ResultSet对象。但是ResultSet对象持有的资源会在下一次垃圾回收的时候才会被释放。所以在使用完后就关闭ResultSet对象是一个最佳实践。</p>
+<p>Once a Statement has been closed, any attempt to access any of its methods with the exception of the is Closed or close methods will result in a SQLException being thrown.<br>一旦Statement被关闭，操作他的有些方法会抛出SQLException。</p>
+<p>These comments about closing Statement objects apply to PreparedStatement and CallableStatement objects as well.<br>上面说的对于PreparedStatement和CallableStatement同样适用。</p>
+</blockquote>
+<p><strong>问题：</strong></p>
+<ul>
+<li>通过Statement关闭而关闭ResultSet不会释放资源是什么志愿。和主动close ResultSet不一样？</li>
+<li><code>any attempt to access any of its methods with the exception of the is Closed or close methods will result in a SQLException being thrown</code>这句话说close也会触发异常，但是其实不会，为什么。</li>
+</ul>
+<p>例子：如果你在关闭了Statement后继续操作之前生成的ResultSet就会触发异常：</p>
+<pre><code>Exception in thread &quot;main&quot; java.sql.SQLException: Operation not allowed after ResultSet closed
+</code></pre><p>一个关闭连接的良好例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">public static void close(Connection con,Statement stmt,ResultSet rs)&#123;</span><br><span class="line">    if(rs != null)&#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            rs.close();      // 关闭结果集</span><br><span class="line">        &#125; catch (SQLException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            if(stmt != null)&#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    stmt.close();    // 关闭</span><br><span class="line">                &#125;catch (SQLException e)&#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125; finally &#123;</span><br><span class="line">                    if(con != null)&#123;</span><br><span class="line">                        try &#123;</span><br><span class="line">                            con.close();</span><br><span class="line">                        &#125; catch (SQLException e) &#123;</span><br><span class="line">                            e.printStackTrace();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li>《Java数据库详解》</li>
+<li><a href="http://www.cnblogs.com/taoweiji/archive/2012/12/11/2812295.html" target="_blank" rel="noopener">在eclipse导入Java 的jar包的方法 JDBC【图文说明】 - 陶伟基Wiki - 博客园</a></li>
+<li><a href="http://docs.oracle.com/javase/7/docs/technotes/guides/jdbc/" target="_blank" rel="noopener">Java SE 7 Java Database Connectivity (JDBC)-related APIs &amp; Developer Guides</a></li>
+</ul>
+</div><div class="reward"><hr><div class="text">如果觉得文章对你有帮助，就打赏杯咖啡钱呗😊</div><img src="/img/reward/weixin.png"><img src="/img/reward/alipay.png"></div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="http://mushanshitiancai.github.io/2016/04/07/java/language/JDBC学习/" data-id="cjik48tos00d2n731rzo6upz3" class="article-share-link">分享</a><div class="tags"><a href="/tags/java/">java</a></div><div class="post-nav"><a href="/2016/04/10/linux/Vagrant笔记-安装配置/" class="pre">Vagrant笔记-安装配置</a><a href="/2016/04/04/project/pp-sword总结/" class="next">pp-sword总结</a></div><div id="disqus_thread"><div class="btn_click_load"><button class="disqus_click_btn">阅读评论 「请确保 disqus.com 可以正常加载」</button></div><script>var disqus_shortname = 'mushan';
+var disqus_identifier = '2016/04/07/java/language/JDBC学习/';
+var disqus_title = 'JDBC学习';
+var disqus_url = 'http://mushanshitiancai.github.io/2016/04/07/java/language/JDBC学习/';
+$('.btn_click_load').click(function() {
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+  $('.btn_click_load').css('display','none');
+});
+$.ajax({
+  url: 'https://disqus.com/favicon.ico',
+  timeout: 3000,
+  type: 'GET',
+  success: (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    $('.btn_click_load').css('display','none');
+  })(),
+  error: function() {
+    $('.btn_click_load').css('display','block');
+  }
+});</script><script id="dsq-count-scr" src="//mushan.disqus.com/count.js" async></script></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" class="search-form"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="http://mushanshitiancai.github.io"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker/">Docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/Groovy/">Groovy</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/JDK源码阅读/">JDK源码阅读</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/掌握Java/">掌握Java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/调试/">调试</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaScript/">JavaScript</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/JavaScript/TypeScript/">TypeScript</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/MongoDB/">MongoDB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/RabbitMQ/">RabbitMQ</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tomcat/">Tomcat</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/electron/">electron</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/自动化/">自动化</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/nginx/" style="font-size: 15px;">nginx</a> <a href="/tags/work/" style="font-size: 15px;">work</a> <a href="/tags/log/" style="font-size: 15px;">log</a> <a href="/tags/db/" style="font-size: 15px;">db</a> <a href="/tags/mongodb/" style="font-size: 15px;">mongodb</a> <a href="/tags/js/" style="font-size: 15px;">js</a> <a href="/tags/angularjs/" style="font-size: 15px;">angularjs</a> <a href="/tags/react/" style="font-size: 15px;">react</a> <a href="/tags/mmnote/" style="font-size: 15px;">mmnote</a> <a href="/tags/architecture/" style="font-size: 15px;">architecture</a> <a href="/tags/protocol-buffers/" style="font-size: 15px;">protocol-buffers</a> <a href="/tags/blog/" style="font-size: 15px;">blog</a> <a href="/tags/mq/" style="font-size: 15px;">mq</a> <a href="/tags/redis/" style="font-size: 15px;">redis</a> <a href="/tags/tools/" style="font-size: 15px;">tools</a> <a href="/tags/emacs/" style="font-size: 15px;">emacs</a> <a href="/tags/管理后台/" style="font-size: 15px;">管理后台</a> <a href="/tags/linux/" style="font-size: 15px;">linux</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/docker/" style="font-size: 15px;">docker</a> <a href="/tags/shell/" style="font-size: 15px;">shell</a> <a href="/tags/os/" style="font-size: 15px;">os</a> <a href="/tags/vagrant/" style="font-size: 15px;">vagrant</a> <a href="/tags/tmux/" style="font-size: 15px;">tmux</a> <a href="/tags/mac/" style="font-size: 15px;">mac</a> <a href="/tags/automation/" style="font-size: 15px;">automation</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/http/" style="font-size: 15px;">http</a> <a href="/tags/python/" style="font-size: 15px;">python</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/php/" style="font-size: 15px;">php</a> <a href="/tags/project/" style="font-size: 15px;">project</a> <a href="/tags/software/" style="font-size: 15px;">software</a> <a href="/tags/test/" style="font-size: 15px;">test</a> <a href="/tags/ffmpeg/" style="font-size: 15px;">ffmpeg</a> <a href="/tags/gm/" style="font-size: 15px;">gm</a> <a href="/tags/graphicsmagick/" style="font-size: 15px;">graphicsmagick</a> <a href="/tags/wireshark/" style="font-size: 15px;">wireshark</a> <a href="/tags/vscode/" style="font-size: 15px;">vscode</a> <a href="/tags/web/" style="font-size: 15px;">web</a> <a href="/tags/curl/" style="font-size: 15px;">curl</a> <a href="/tags/jvm/" style="font-size: 15px;">jvm</a> <a href="/tags/javafx/" style="font-size: 15px;">javafx</a> <a href="/tags/guava/" style="font-size: 15px;">guava</a> <a href="/tags/junit/" style="font-size: 15px;">junit</a> <a href="/tags/idea/" style="font-size: 15px;">idea</a> <a href="/tags/groovy/" style="font-size: 15px;">groovy</a> <a href="/tags/tomcat/" style="font-size: 15px;">tomcat</a> <a href="/tags/maven/" style="font-size: 15px;">maven</a> <a href="/tags/doclet/" style="font-size: 15px;">doclet</a> <a href="/tags/servlet/" style="font-size: 15px;">servlet</a> <a href="/tags/dubbo/" style="font-size: 15px;">dubbo</a> <a href="/tags/electron/" style="font-size: 15px;">electron</a> <a href="/tags/spring/" style="font-size: 15px;">spring</a> <a href="/tags/css/" style="font-size: 15px;">css</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/jquery/" style="font-size: 15px;">jquery</a> <a href="/tags/nodejs/" style="font-size: 15px;">nodejs</a> <a href="/tags/typescript/" style="font-size: 15px;">typescript</a> <a href="/tags/ts/" style="font-size: 15px;">ts</a> <a href="/tags/gulp/" style="font-size: 15px;">gulp</a> <a href="/tags/webpack/" style="font-size: 15px;">webpack</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/06/17/linux/Linux-UNIX编程如何保证文件落盘/">Linux/UNIX编程如何保证文件落盘</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/db/MongoDB遍历方式对比/">MongoDB遍历方式对比</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/04/java/language/JDK源码阅读-RandomAccessFile/">JDK源码阅读-RandomAccessFile</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/04/java/language/JDK源码阅读-FileOutputStream/">JDK源码阅读-FileOutputStream</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/03/java/language/JDK源码阅读-FileInputStream/">JDK源码阅读-FileInputStream</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/29/java/language/JDK源码阅读-FileDescriptor/">JDK源码阅读-FileDescriptor</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/28/java/debug/JVM堆内存使用率持续上升的一种排查思路/">JVM堆内存使用率持续上升的一种排查思路</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/09/network/AWS-S3-Range下载响应测试/">AWS S3 Range下载响应测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/15/db/MongoDB笔记-查询计划/">MongoDB笔记-查询计划</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/23/network/URI-URL与URN的区别/">URI,URL与URN的区别</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-comment-o"> 最近评论</i></div><script type="text/javascript" src="//mushan.disqus.com/recent_comments_widget.js?num_items=5&amp;hide_avatars=1&amp;avatar_size=32&amp;excerpt_length=20&amp;hide_mods=1"></script></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://anotom.com/" title="鑫哥的博客" target="_blank">鑫哥的博客</a><ul></ul><a href="https://www.caylor.cc/" title="乐哥的博客" target="_blank">乐哥的博客</a><ul></ul><a href="http://zach41.github.io/" title="小美的博客" target="_blank">小美的博客</a><ul></ul><a href="http://blog.csdn.net/sinat_25127047" title="瀚文的博客" target="_blank">瀚文的博客</a><ul></ul><a href="http://blog.csdn.net/xiaohangblog?viewmode=contents)" title="小杭的博客" target="_blank">小杭的博客</a><ul></ul><a href="http://bettercuicui.github.io/" title="夏侯的博客" target="_blank">夏侯的博客</a><ul></ul><a href="http://damye.github.io/" title="符尧的博客" target="_blank">符尧的博客</a><ul></ul><a href="http://blog.shrp.me/" title="尚弟的博客" target="_blank">尚弟的博客</a><ul></ul><a href="http://imethan.cn" title="应锋的博客" target="_blank">应锋的博客</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2018 <a href="/." rel="nofollow">木杉的博客.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>

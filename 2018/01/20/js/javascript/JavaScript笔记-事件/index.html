@@ -1,0 +1,462 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="这是木杉的个人博客"><title>JavaScript笔记-事件 | 木杉的博客</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/6.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">JavaScript笔记-事件</h1><a id="logo" href="/.">木杉的博客</a><p class="description">要么精通，要么死</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div id="layout" class="pure-g"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">JavaScript笔记-事件</h1><div class="post-meta">Jan 20, 2018<span> | </span><span class="category"><a href="/categories/JavaScript/">JavaScript</a></span><script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> 阅读</span></span></div><a data-disqus-identifier="2018/01/20/js/javascript/JavaScript笔记-事件/" href="/2018/01/20/js/javascript/JavaScript笔记-事件/#disqus_thread" class="disqus-comment-count"></a><div class="clear"><div id="toc" class="toc-article"><div class="toc-title">文章目录</div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#事件流"><span class="toc-number">1.</span> <span class="toc-text">事件流</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#事件处理程序"><span class="toc-number">2.</span> <span class="toc-text">事件处理程序</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HTML事件处理程序"><span class="toc-number">2.1.</span> <span class="toc-text">HTML事件处理程序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DOM0级事件处理程序"><span class="toc-number">2.2.</span> <span class="toc-text">DOM0级事件处理程序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DOM2级事件处理程序"><span class="toc-number">2.3.</span> <span class="toc-text">DOM2级事件处理程序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#事件对象"><span class="toc-number">3.</span> <span class="toc-text">事件对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#事件类型"><span class="toc-number">4.</span> <span class="toc-text">事件类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#UI事件"><span class="toc-number">4.1.</span> <span class="toc-text">UI事件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#焦点事件"><span class="toc-number">4.2.</span> <span class="toc-text">焦点事件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#鼠标与滚轮事件"><span class="toc-number">4.3.</span> <span class="toc-text">鼠标与滚轮事件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#键盘与文本事件"><span class="toc-number">5.</span> <span class="toc-text">键盘与文本事件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#输入法事件"><span class="toc-number">6.</span> <span class="toc-text">输入法事件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他有用的事件"><span class="toc-number">7.</span> <span class="toc-text">其他有用的事件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">8.</span> <span class="toc-text">参考资料</span></a></li></ol></div></div><div class="post-content"><p>《JavaScript高级程序设计》事件部分笔记。</p>
+<a id="more"></a>
+<h2 id="事件流"><a href="#事件流" class="headerlink" title="事件流"></a>事件流</h2><p>事件流描述的是页面的元素接收事件的顺序。</p>
+<p>当时IE4.0提出了冒泡模型，而Netscape4.0提出的是捕获模型。</p>
+<p>比如这样的一个页面：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Event Bubbling Example<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"myDiv"</span>&gt;</span>Click Me<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>事件冒泡是这样的：</p>
+<p><img src="/img/js/event-bubbling.png" alt=""></p>
+<ul>
+<li>所有浏览器都支持</li>
+<li>会一直冒泡到window对象（图片只画到了document对象）</li>
+<li>不是所有事件都会冒泡</li>
+</ul>
+<p>事件捕获是这样的：</p>
+<p><img src="/img/js/event-capturing.png" alt=""></p>
+<ul>
+<li>DOM2级事件规范从document对象开始传播，但是浏览器实现都是从window对象开始传播</li>
+<li>IE9、Safari、Chrome、Firefox 和 Opera 9.5 及更高版本</li>
+</ul>
+<p>DOM2事件流则是两种的整合:</p>
+<p><img src="/img/js/event-dom-event-flow.png" alt=""></p>
+<ul>
+<li>有三个阶段：1.事件捕获阶段 2.目标阶段 3.事件冒泡阶段</li>
+<li>DOM2级事件规范要求捕获阶段目标不会收到事件。也就是说，例子中，div被点击了，首先是捕获阶段document &gt; html &gt; body就结束了。但是目前的浏览器实现，会在捕获阶段也让目标收到事件，也就是捕获阶段变为：document &gt; html &gt; body &gt; div。</li>
+<li>IE9、Safari、Chrome、Firefox 和 Opera 9.5 及更高版本支持</li>
+</ul>
+<h2 id="事件处理程序"><a href="#事件处理程序" class="headerlink" title="事件处理程序"></a>事件处理程序</h2><h3 id="HTML事件处理程序"><a href="#HTML事件处理程序" class="headerlink" title="HTML事件处理程序"></a>HTML事件处理程序</h3><p>使用HTML特性指定事件的处理代码。不推荐使用了。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"button"</span> <span class="attr">value</span>=<span class="string">"Click Me"</span> <span class="attr">onclick</span>=<span class="string">"alert(&amp;quot;Clicked&amp;quot;)"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>可以使用一些特殊变量：<code>this</code>，<code>event</code></li>
+</ul>
+<h3 id="DOM0级事件处理程序"><a href="#DOM0级事件处理程序" class="headerlink" title="DOM0级事件处理程序"></a>DOM0级事件处理程序</h3><p>DOM0级的特点是简单粗暴。每个元素（包括window和document）都有自己的事件处理程序属性，一般命名是在事件名称前加上on，比如<code>onclick</code>。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> btn = <span class="built_in">document</span>.getElementById(<span class="string">"myBtn"</span>);</span><br><span class="line">btn.onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    alert(<span class="keyword">this</span>.id);    <span class="comment">//"myBtn"</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">btn.onclick = <span class="literal">null</span>; <span class="comment">//删除事件处理程序</span></span><br></pre></td></tr></table></figure>
+<h3 id="DOM2级事件处理程序"><a href="#DOM2级事件处理程序" class="headerlink" title="DOM2级事件处理程序"></a>DOM2级事件处理程序</h3><p>DOM0级事件处理程序虽然简单，但是有明显缺点，就是一个元素只能绑定一个事件处理函数。所以DOM2级规范定义了两个方法：<code>addEventListener()</code>和<code>removeEventListener()</code>。</p>
+<p><code>addEventListener(type, listener[, useCapture])</code>有三个参数：</p>
+<ul>
+<li><code>type</code> 事件名称</li>
+<li><code>listener</code> 事件处理函数</li>
+<li><code>useCapture</code> 是否在捕获阶段调用处理程序。ture表示在捕获阶段，false表示在冒泡阶段。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> btn = <span class="built_in">document</span>.getElementById(<span class="string">"myBtn"</span>);</span><br><span class="line">btn.addEventListener(<span class="string">"click"</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    alert(<span class="keyword">this</span>.id);</span><br><span class="line">&#125;, <span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+<p><code>removeEventListener()</code>和<code>addEventListener()</code>拥有一样的方法签名。只是指定的<code>listener</code>是你想要删除的事件处理函数的<strong>引用</strong>。</p>
+<h2 id="事件对象"><a href="#事件对象" class="headerlink" title="事件对象"></a>事件对象</h2><p>在DOM上触发事件时，会产生一个event对象。通过这个对象我们可以知道发生了什么事件，目标是谁等等。不同的事件产生的event对象的属性是不一样的。共有的属性有：</p>
+<table>
+<thead>
+<tr>
+<th>属性/方法</th>
+<th>类型</th>
+<th>读写</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bubbles</td>
+<td>Boolean</td>
+<td>只读</td>
+<td>表明是否冒泡</td>
+</tr>
+<tr>
+<td>cancelable</td>
+<td>Boolean</td>
+<td>只读</td>
+<td>表明是否可以取消事件的默认行为</td>
+</tr>
+<tr>
+<td>currentTarget</td>
+<td>Element</td>
+<td>只读</td>
+<td>事件处理程序绑定的元素</td>
+</tr>
+<tr>
+<td>defaultPrevented</td>
+<td>Boolean</td>
+<td>只读</td>
+<td>为true表示已经调用了preventDefault()(DOM3级事件中新增)</td>
+</tr>
+<tr>
+<td>detail</td>
+<td>Integer</td>
+<td>只读</td>
+<td>与事件相关的细节信息</td>
+</tr>
+<tr>
+<td>eventPhase</td>
+<td>Integer</td>
+<td>只读</td>
+<td>调用事件处理程序的阶段:1表示捕获阶段，2表示“处于目标”，3表示冒泡阶段</td>
+</tr>
+<tr>
+<td>preventDefault()</td>
+<td>Function</td>
+<td>只读</td>
+<td>取消事件的默认行为。如果cancelable是true，则可以使用这个方法</td>
+</tr>
+<tr>
+<td>stopImmediatePropagation()</td>
+<td>Function</td>
+<td>只读</td>
+<td>取消事件的进一步捕获或冒泡，同时阻止任何事件处理程序被调用(DOM3级事件中新增)</td>
+</tr>
+<tr>
+<td>stopPropagation()</td>
+<td>Function</td>
+<td>只读</td>
+<td>取消事件的进一步捕获或冒泡。如果bubbles为true，则可以使用这个方法</td>
+</tr>
+<tr>
+<td>target</td>
+<td>Element</td>
+<td>只读</td>
+<td>事件的目标</td>
+</tr>
+<tr>
+<td>trusted</td>
+<td>Boolean</td>
+<td>只读</td>
+<td>为true表示事件是浏览器生成的。为false表 示事件是由开发人员通过JavaScript创建的(DOM3级事件中新增)</td>
+</tr>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>只读</td>
+<td>被触发的事件的类型</td>
+</tr>
+<tr>
+<td>view</td>
+<td>AbstractView</td>
+<td>只读</td>
+<td>与事件关联的抽象视图。等同于发生事件的window对象</td>
+</tr>
+</tbody>
+</table>
+<p>在事件处理函数内部，<code>this</code>始终等于<code>currentTarget</code>的值。而<code>target</code>始终指向触发事件的对象。</p>
+<p><img src="/img/js/event-object-test.png" alt=""><br>事件实验：<a href="http://jsbin.com/zucutidozi/2/edit?html,js,output" target="_blank" rel="noopener">http://jsbin.com/zucutidozi/2/edit?html,js,output</a></p>
+<p>只有在事件处理程序执行期间，event 对象才会存在;一旦事件处理程序执行完 成，event 对象就会被销毁。</p>
+<h2 id="事件类型"><a href="#事件类型" class="headerlink" title="事件类型"></a>事件类型</h2><p>DOM3级事件规定了一下几类事件：</p>
+<ul>
+<li>UI事件，当用户与页面上的元素交互时触发;</li>
+<li>焦点事件，当元素获得或失去焦点时触发;</li>
+<li>鼠标事件，当用户通过鼠标在页面上执行操作时触发;</li>
+<li>滚轮事件，当使用鼠标滚轮(或类似设备)时触发;</li>
+<li>文本事件，当在文档中输入文本时触发;</li>
+<li>键盘事件，当用户通过键盘在页面上执行操作时触发;</li>
+<li>合成事件，当为 IME(Input Method Editor，输入法编辑器)输入字符时触发;</li>
+<li>变动(mutation)事件，当底层 DOM 结构发生变化时触发。</li>
+<li>变动名称事件，当元素或属性名变动时触发。此类事件已经被废弃，没有任何浏览器实现它们。</li>
+</ul>
+<p>全部事件的列表可以参考官方文档：<a href="https://developer.mozilla.org/en-US/docs/Web/Events" target="_blank" rel="noopener">Event reference | MDN</a></p>
+<p>事件涉及到的细节很多，比如每个事件是否是冒泡的，是否有默认行为，是否可以取消默认行为，是否会非常频繁的触发等等等等，所以最好是多查官方文档。</p>
+<h3 id="UI事件"><a href="#UI事件" class="headerlink" title="UI事件"></a>UI事件</h3><ul>
+<li><code>load</code><ul>
+<li>页面完全加载后在window上触发</li>
+<li>所有框架都加载完成后在框架集上触发</li>
+<li>图片加载完成后在img元素上触发</li>
+<li>嵌入内容加载完毕后在object元素上触发</li>
+</ul>
+</li>
+<li><code>unload</code><ul>
+<li>页面完全卸载后在window上触发（用户切换页面的时候发生）</li>
+<li>所有框架都卸载后在框架集上触发</li>
+<li>嵌入内容卸载后在object元素上触发</li>
+</ul>
+</li>
+<li><code>abort</code> 在用户停止下载过程时，如果嵌入的内容没有加载完，则在object元素上面触发</li>
+<li><code>error</code> <ul>
+<li>当发生 JavaScript 错误时在 window 上面触发</li>
+<li>当无法加载图像时在img元素上面触 发</li>
+<li>当无法加载嵌入内容时在object元素上面触发</li>
+<li>当有一或多个框架无法加载时在框架集上面触发</li>
+</ul>
+</li>
+<li><code>select</code> 当用户选择文本框(input或texterea)中的一或多个字符时触发<ul>
+<li>是否冒泡：是</li>
+<li>是否可以取消：否</li>
+<li>目标：Element</li>
+<li>默认行为：无</li>
+</ul>
+</li>
+<li><code>resize</code> 当窗口或框架的大小变化时在window或框架上面触发<ul>
+<li>是否冒泡：否</li>
+<li>是否可以取消：否</li>
+<li>目标：defaultView</li>
+<li>默认行为：无</li>
+<li>变化1像素就会触发，所以会非常频繁的触发，所以事件处理程序不能有非常复杂的逻辑（写法见官方文档）</li>
+</ul>
+</li>
+<li><code>scroll</code> 当用户滚动带滚动条的元素中的内容时，在该元素上面触发。body元素中包含所加载页面的滚动条<ul>
+<li>是否冒泡：普通元素上触发不会冒泡，但是如果是在document上触发，则会冒泡到window</li>
+<li>是否可以取消：否</li>
+<li>默认行为：无</li>
+<li>目标：defaultView, Document, Element</li>
+<li>如果是整个页面滚动，也就是document滚动，可以通过<code>document.documentElement</code>的<code>scrollTop</code>和<code>scrollLeft</code>属性获取滚动的距离</li>
+<li>如果是具体的元素滚动，则可以获取具体元素的<code>scrollTop</code>和<code>scrollLeft</code>属性获取滚动的距离</li>
+</ul>
+</li>
+</ul>
+<h3 id="焦点事件"><a href="#焦点事件" class="headerlink" title="焦点事件"></a>焦点事件</h3><ul>
+<li><code>focus</code> 在元素获得焦点时触发。不冒泡</li>
+<li><code>blur</code> 在元素失去焦点时触发。不冒泡</li>
+<li><code>focusin</code> 在元素获得焦点时触发。冒泡</li>
+<li><code>focusout</code> 在元素失去焦点时触发。冒泡</li>
+</ul>
+<p>在焦点从一个元素到另外一个元素上时，事件触发顺序如下：</p>
+<ol>
+<li>focusout 在失去焦点的元素上触发;</li>
+<li>focusin 在获得焦点的元素上触发;</li>
+<li>blur 在失去焦点的元素上触发;</li>
+<li>focus 在获得焦点的元素上触发;</li>
+</ol>
+<p><code>focusin/focusout</code>相较于<code>focus/blur</code>，有两个优点：</p>
+<ol>
+<li><code>focusin/focusout</code>会冒泡，<code>focus/blur</code>不会</li>
+<li><code>focusin/focusout</code>的<code>FocusEvent.relatedTarget</code>字段会设置为前一个聚焦的元素/下一个聚焦的元素</li>
+</ol>
+<h3 id="鼠标与滚轮事件"><a href="#鼠标与滚轮事件" class="headerlink" title="鼠标与滚轮事件"></a>鼠标与滚轮事件</h3><ul>
+<li><code>click</code> 按下鼠标左键或者回车键触发</li>
+<li><code>dbclick</code> 双击鼠标左键触发</li>
+<li><code>mousedown</code> 按键任意鼠标按键触发</li>
+<li><code>mouseup</code> 释放鼠标按键时触发</li>
+<li><code>mouseenter</code> 在鼠标首次移动到元素范围内触发。不冒泡</li>
+<li><code>mouseleave</code> 在鼠标移动到元数据范围外触发。不冒泡</li>
+<li><code>mouseover</code> 在鼠标首次移动到元素范围内触发</li>
+<li><code>mouseout</code> 在鼠标从一个元素移动到另外一个元素（可以是子元素）时触发</li>
+<li><code>mousemove</code> 当鼠标在元素内移动时重复触发。</li>
+</ul>
+<p>除了<code>mouseenter</code>和<code>mouseleave</code>都会冒泡，也可以被取消。</p>
+<p>只有在同一个元素上触发了<code>mousedown</code>和<code>mouseup</code>事件才会触发<code>click</code>事件。如果其中一个被取消，就不会触发<code>click</code>事件。只有两次连续触发<code>click</code>事件才会触发<code>dbclick</code>事件。<code>mousedown</code>和<code>mouseup</code>事件不受其他事件影响。</p>
+<p><code>dbclick</code>完整的触发顺序如下：</p>
+<ol>
+<li>mousedown </li>
+<li>mouseup </li>
+<li>click</li>
+<li>mousedown </li>
+<li>mouseup</li>
+<li>click</li>
+<li>dblclick</li>
+</ol>
+<p>鼠标事件产生的对象是<code>MouseEvent</code>对象。有一些有用的属性：</p>
+<table>
+<thead>
+<tr>
+<th>属性名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>x/y</td>
+<td>clientX/clientY的别名</td>
+</tr>
+<tr>
+<td>clientX/clientY</td>
+<td>以浏览器左上角为原点的鼠标点击位置</td>
+</tr>
+<tr>
+<td>pageX/pageY</td>
+<td>以页面左上角为原点的鼠标点击位置</td>
+</tr>
+<tr>
+<td>screenX/screenY</td>
+<td>以屏幕左上角为原点的鼠标点击位置</td>
+</tr>
+<tr>
+<td>offsetX/offsetY</td>
+<td>以元素左上角为原点的鼠标点击位置</td>
+</tr>
+<tr>
+<td>shiftKey</td>
+<td>事件发生时，shift键是否按下</td>
+</tr>
+<tr>
+<td>ctrlKey</td>
+<td>事件发生时，ctrl键是否按下</td>
+</tr>
+<tr>
+<td>altKey</td>
+<td>事件发生时，alt键是否按下</td>
+</tr>
+<tr>
+<td>metaKey</td>
+<td>事件发生时，meta键是否按下</td>
+</tr>
+<tr>
+<td>button</td>
+<td>鼠标按下的按键值，具体见下表</td>
+</tr>
+<tr>
+<td>buttons</td>
+<td>鼠标按下的所有按键组合值，具体见下表</td>
+</tr>
+<tr>
+<td>detail</td>
+<td>鼠标在该位置上连续点击几次</td>
+</tr>
+</tbody>
+</table>
+<p>如果网页没有滚动，那么<code>clientX/clientY</code>和<code>pageX/pageY</code>是相等的。</p>
+<p>button属性的取值：</p>
+<ul>
+<li>0 左键</li>
+<li>1 中键</li>
+<li>2 右键</li>
+<li>3 鼠标后退键</li>
+<li>4 鼠标前进键</li>
+</ul>
+<p>但是如果同时按下多个按键怎么办呢？可以用buttons字段：</p>
+<ul>
+<li>0 没有按键</li>
+<li>1 左键</li>
+<li>2 中键</li>
+<li>4 右键</li>
+<li>8 鼠标后退键</li>
+<li>16 鼠标前进键</li>
+</ul>
+<p>这些按键的或(|)运算得出button的取值，所以可以通过buttons值算出当前有哪些按键按下。</p>
+<p>如果事件是<code>mouseenter</code>，<code>mouseleave</code>，<code>mouseover</code>，<code>mouseout</code>，<code>MouseEvent.relatedTarge</code>会设置为响应的相关对象：</p>
+<table>
+<thead>
+<tr>
+<th>事件</th>
+<th>target属性</th>
+<th>relatedTarge属性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mouseenter</td>
+<td>鼠标进入的元素</td>
+<td>鼠标离开的元素</td>
+</tr>
+<tr>
+<td>mouseleave</td>
+<td>鼠标离开的元素</td>
+<td>鼠标进入的元素</td>
+</tr>
+<tr>
+<td>mouseover</td>
+<td>鼠标进入的元素</td>
+<td>鼠标离开的元素</td>
+</tr>
+<tr>
+<td>mouseout</td>
+<td>鼠标离开的元素</td>
+<td>鼠标进入的元素</td>
+</tr>
+</tbody>
+</table>
+<p>鼠标事件实验：<a href="http://jsbin.com/soqocumeva/1/edit?html,js,output" target="_blank" rel="noopener">http://jsbin.com/soqocumeva/1/edit?html,js,output</a></p>
+<h2 id="键盘与文本事件"><a href="#键盘与文本事件" class="headerlink" title="键盘与文本事件"></a>键盘与文本事件</h2><p>键盘事件：</p>
+<ul>
+<li><code>keydown</code> 按下任意按键触发，按住不放重复触发</li>
+<li><code>keypress</code> 按键字符按键触发，按住不放重复触发</li>
+<li><code>keyup</code> 释放按键触发</li>
+</ul>
+<p>按下字符按键，事件触发顺序：</p>
+<ol>
+<li>keydown</li>
+<li>keypress</li>
+<li>（文本框发生变化）</li>
+<li>keyup</li>
+</ol>
+<p>按下非字符按键，不会触发keypress事件。</p>
+<p>键盘事件产生的事件对象是<code>KeyboardEvent</code>，有用的属性有：</p>
+<table>
+<thead>
+<tr>
+<th>属性名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>key</td>
+<td>按键的值，比如a，A,Shift</td>
+</tr>
+<tr>
+<td>code</td>
+<td>按键的名称，比如KeyA,ShiftLeft</td>
+</tr>
+<tr>
+<td>keyCode</td>
+<td>按键码，与ASCII的小写编码相同。用code替代</td>
+</tr>
+<tr>
+<td>charCode</td>
+<td>字符编码。keypress事件才有。用key替代</td>
+</tr>
+<tr>
+<td>shiftKey</td>
+<td>事件发生时，shift键是否按下</td>
+</tr>
+<tr>
+<td>ctrlKey</td>
+<td>事件发生时，ctrl键是否按下</td>
+</tr>
+<tr>
+<td>altKey</td>
+<td>事件发生时，alt键是否按下</td>
+</tr>
+<tr>
+<td>metaKey</td>
+<td>事件发生时，meta键是否按下</td>
+</tr>
+<tr>
+<td>repeat</td>
+<td>是否是按住而触发的</td>
+</tr>
+</tbody>
+</table>
+<p>可以用<code>String.fromCharCode()</code>将charCode转为实际的字符。</p>
+<p>只有一个文本事件：</p>
+<ul>
+<li><code>textInput</code> 在文本插入<strong>可编辑区域</strong>前触发</li>
+</ul>
+<p>textInput事件产生的是<code>TextEvent</code>对象</p>
+<h2 id="输入法事件"><a href="#输入法事件" class="headerlink" title="输入法事件"></a>输入法事件</h2><p>标准名称是复合事件(composition event)，处理的是IME相关的事件。</p>
+<ul>
+<li><code>compositionstart</code> IME打开时触发</li>
+<li><code>compositionupdate</code> 在IME中输入新字符时触发</li>
+<li><code>compositionend</code> 在IME关闭时触发</li>
+</ul>
+<p>产生的事件是<code>CompositionEvent</code>，包含一个<code>data</code>字段</p>
+<ul>
+<li><code>compositionstart</code>时，<code>data</code>为正在编辑的字段，比如选中的字段</li>
+<li><code>compositionupdate</code>时，<code>data</code>为最新输入的字符串，比如<code>hao</code></li>
+<li><code>compositionend</code>时，<code>data</code>为最终输入的字符串，比如<code>好</code></li>
+</ul>
+<h2 id="其他有用的事件"><a href="#其他有用的事件" class="headerlink" title="其他有用的事件"></a>其他有用的事件</h2><ul>
+<li><code>contextmenu</code><br>  在打开上下文菜单时触发。产生的是<code>MouseEvent</code>。<br>  可以用<code>event.preventDefalut()</code>取消默认的菜单。</li>
+</ul>
+<p>事件实验：<a href="http://jsbin.com/soqocumeva/9/edit?html,js,output" target="_blank" rel="noopener">http://jsbin.com/soqocumeva/9/edit?html,js,output</a></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li><a href="http://blog.csdn.net/pxy_lele/article/details/49755071/" target="_blank" rel="noopener">DOM0, DOM1, DOM2, DOM3 - CSDN博客</a></li>
+<li>《JavaScript高级程序设计》</li>
+</ul>
+</div><div class="reward"><hr><div class="text">如果觉得文章对你有帮助，就打赏杯咖啡钱呗😊</div><img src="/img/reward/weixin.png"><img src="/img/reward/alipay.png"></div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="http://mushanshitiancai.github.io/2018/01/20/js/javascript/JavaScript笔记-事件/" data-id="cjik48trv00jgn731bxkhqqyd" class="article-share-link">分享</a><div class="tags"><a href="/tags/js/">js</a><a href="/tags/javascript/">javascript</a></div><div class="post-nav"><a href="/2018/01/21/js/javascript/JavaScript笔记-什么元素是focusable的？/" class="pre">JavaScript笔记-什么元素是focusable的？</a><a href="/2018/01/18/java/language/掌握Java-Bean-Validation/" class="next">掌握Java-Bean Validation</a></div><div id="disqus_thread"><div class="btn_click_load"><button class="disqus_click_btn">阅读评论 「请确保 disqus.com 可以正常加载」</button></div><script>var disqus_shortname = 'mushan';
+var disqus_identifier = '2018/01/20/js/javascript/JavaScript笔记-事件/';
+var disqus_title = 'JavaScript笔记-事件';
+var disqus_url = 'http://mushanshitiancai.github.io/2018/01/20/js/javascript/JavaScript笔记-事件/';
+$('.btn_click_load').click(function() {
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+  $('.btn_click_load').css('display','none');
+});
+$.ajax({
+  url: 'https://disqus.com/favicon.ico',
+  timeout: 3000,
+  type: 'GET',
+  success: (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    $('.btn_click_load').css('display','none');
+  })(),
+  error: function() {
+    $('.btn_click_load').css('display','block');
+  }
+});</script><script id="dsq-count-scr" src="//mushan.disqus.com/count.js" async></script></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" class="search-form"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="http://mushanshitiancai.github.io"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker/">Docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/Groovy/">Groovy</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/JDK源码阅读/">JDK源码阅读</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/掌握Java/">掌握Java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java/调试/">调试</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaScript/">JavaScript</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/JavaScript/TypeScript/">TypeScript</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/MongoDB/">MongoDB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/RabbitMQ/">RabbitMQ</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tomcat/">Tomcat</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/electron/">electron</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/自动化/">自动化</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/nginx/" style="font-size: 15px;">nginx</a> <a href="/tags/work/" style="font-size: 15px;">work</a> <a href="/tags/log/" style="font-size: 15px;">log</a> <a href="/tags/db/" style="font-size: 15px;">db</a> <a href="/tags/mongodb/" style="font-size: 15px;">mongodb</a> <a href="/tags/js/" style="font-size: 15px;">js</a> <a href="/tags/angularjs/" style="font-size: 15px;">angularjs</a> <a href="/tags/react/" style="font-size: 15px;">react</a> <a href="/tags/mmnote/" style="font-size: 15px;">mmnote</a> <a href="/tags/architecture/" style="font-size: 15px;">architecture</a> <a href="/tags/protocol-buffers/" style="font-size: 15px;">protocol-buffers</a> <a href="/tags/blog/" style="font-size: 15px;">blog</a> <a href="/tags/mq/" style="font-size: 15px;">mq</a> <a href="/tags/redis/" style="font-size: 15px;">redis</a> <a href="/tags/tools/" style="font-size: 15px;">tools</a> <a href="/tags/emacs/" style="font-size: 15px;">emacs</a> <a href="/tags/管理后台/" style="font-size: 15px;">管理后台</a> <a href="/tags/linux/" style="font-size: 15px;">linux</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/docker/" style="font-size: 15px;">docker</a> <a href="/tags/shell/" style="font-size: 15px;">shell</a> <a href="/tags/os/" style="font-size: 15px;">os</a> <a href="/tags/vagrant/" style="font-size: 15px;">vagrant</a> <a href="/tags/tmux/" style="font-size: 15px;">tmux</a> <a href="/tags/mac/" style="font-size: 15px;">mac</a> <a href="/tags/automation/" style="font-size: 15px;">automation</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/http/" style="font-size: 15px;">http</a> <a href="/tags/python/" style="font-size: 15px;">python</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/php/" style="font-size: 15px;">php</a> <a href="/tags/project/" style="font-size: 15px;">project</a> <a href="/tags/software/" style="font-size: 15px;">software</a> <a href="/tags/test/" style="font-size: 15px;">test</a> <a href="/tags/ffmpeg/" style="font-size: 15px;">ffmpeg</a> <a href="/tags/gm/" style="font-size: 15px;">gm</a> <a href="/tags/graphicsmagick/" style="font-size: 15px;">graphicsmagick</a> <a href="/tags/wireshark/" style="font-size: 15px;">wireshark</a> <a href="/tags/vscode/" style="font-size: 15px;">vscode</a> <a href="/tags/web/" style="font-size: 15px;">web</a> <a href="/tags/curl/" style="font-size: 15px;">curl</a> <a href="/tags/jvm/" style="font-size: 15px;">jvm</a> <a href="/tags/javafx/" style="font-size: 15px;">javafx</a> <a href="/tags/guava/" style="font-size: 15px;">guava</a> <a href="/tags/junit/" style="font-size: 15px;">junit</a> <a href="/tags/idea/" style="font-size: 15px;">idea</a> <a href="/tags/groovy/" style="font-size: 15px;">groovy</a> <a href="/tags/tomcat/" style="font-size: 15px;">tomcat</a> <a href="/tags/maven/" style="font-size: 15px;">maven</a> <a href="/tags/doclet/" style="font-size: 15px;">doclet</a> <a href="/tags/servlet/" style="font-size: 15px;">servlet</a> <a href="/tags/dubbo/" style="font-size: 15px;">dubbo</a> <a href="/tags/electron/" style="font-size: 15px;">electron</a> <a href="/tags/spring/" style="font-size: 15px;">spring</a> <a href="/tags/css/" style="font-size: 15px;">css</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/jquery/" style="font-size: 15px;">jquery</a> <a href="/tags/nodejs/" style="font-size: 15px;">nodejs</a> <a href="/tags/typescript/" style="font-size: 15px;">typescript</a> <a href="/tags/ts/" style="font-size: 15px;">ts</a> <a href="/tags/gulp/" style="font-size: 15px;">gulp</a> <a href="/tags/webpack/" style="font-size: 15px;">webpack</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/06/17/linux/Linux-UNIX编程如何保证文件落盘/">Linux/UNIX编程如何保证文件落盘</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/db/MongoDB遍历方式对比/">MongoDB遍历方式对比</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/04/java/language/JDK源码阅读-RandomAccessFile/">JDK源码阅读-RandomAccessFile</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/04/java/language/JDK源码阅读-FileOutputStream/">JDK源码阅读-FileOutputStream</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/03/java/language/JDK源码阅读-FileInputStream/">JDK源码阅读-FileInputStream</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/29/java/language/JDK源码阅读-FileDescriptor/">JDK源码阅读-FileDescriptor</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/28/java/debug/JVM堆内存使用率持续上升的一种排查思路/">JVM堆内存使用率持续上升的一种排查思路</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/05/09/network/AWS-S3-Range下载响应测试/">AWS S3 Range下载响应测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/15/db/MongoDB笔记-查询计划/">MongoDB笔记-查询计划</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/23/network/URI-URL与URN的区别/">URI,URL与URN的区别</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-comment-o"> 最近评论</i></div><script type="text/javascript" src="//mushan.disqus.com/recent_comments_widget.js?num_items=5&amp;hide_avatars=1&amp;avatar_size=32&amp;excerpt_length=20&amp;hide_mods=1"></script></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://anotom.com/" title="鑫哥的博客" target="_blank">鑫哥的博客</a><ul></ul><a href="https://www.caylor.cc/" title="乐哥的博客" target="_blank">乐哥的博客</a><ul></ul><a href="http://zach41.github.io/" title="小美的博客" target="_blank">小美的博客</a><ul></ul><a href="http://blog.csdn.net/sinat_25127047" title="瀚文的博客" target="_blank">瀚文的博客</a><ul></ul><a href="http://blog.csdn.net/xiaohangblog?viewmode=contents)" title="小杭的博客" target="_blank">小杭的博客</a><ul></ul><a href="http://bettercuicui.github.io/" title="夏侯的博客" target="_blank">夏侯的博客</a><ul></ul><a href="http://damye.github.io/" title="符尧的博客" target="_blank">符尧的博客</a><ul></ul><a href="http://blog.shrp.me/" title="尚弟的博客" target="_blank">尚弟的博客</a><ul></ul><a href="http://imethan.cn" title="应锋的博客" target="_blank">应锋的博客</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2018 <a href="/." rel="nofollow">木杉的博客.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
