@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://mushanshitiancai.github.io/"/>
-  <updated>2018-07-28T09:23:56.612Z</updated>
+  <updated>2018-07-29T04:07:20.186Z</updated>
   <id>http://mushanshitiancai.github.io/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="http://mushanshitiancai.github.io/2018/07/28/java/language/Java%E6%97%A5%E5%BF%97-Log4j%E5%AE%9E%E7%8E%B0%E8%BF%90%E8%A1%8C%E6%97%B6%E4%BF%AE%E6%94%B9%E6%97%A5%E5%BF%97%E7%BA%A7%E5%88%AB/"/>
     <id>http://mushanshitiancai.github.io/2018/07/28/java/language/Java日志-Log4j实现运行时修改日志级别/</id>
     <published>2018-07-28T09:18:54.000Z</published>
-    <updated>2018-07-28T09:23:56.612Z</updated>
+    <updated>2018-07-29T04:07:20.186Z</updated>
     
     <content type="html"><![CDATA[<p><a href="http://imushan.com/2018/07/28/java/language/Java%E6%97%A5%E5%BF%97-Log4j%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" target="_blank" rel="noopener">源码分析</a>后，实现Log4j运行时修改日志级别思路就非常清晰了。</p><a id="more"></a><p>全局的日志级别保存在<code>org.apache.log4j.Hierarchy#threshold</code>中，是通过<code>log4j.threshold</code>配置项设置的，因我们基本不会配置这个配置项，所以可以不用管。</p><p>剩下的日志级别配置在Logger上。我们只要获取对应的Logger，设置其level属性即可：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Logger rootLogger = Logger.getRootLogger();</span><br><span class="line">rootLogger.setLevel(Level.DEBUG);</span><br></pre></td></tr></table></figure><p>嗯，就是这么简单。</p>]]></content>
     
